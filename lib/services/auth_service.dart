@@ -8,6 +8,10 @@ class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
   UserModel? currentUser;
 
+  // Lấy giá trị uid
+  String? get uid => auth.currentUser?.uid;
+  User? get user => auth.currentUser;
+
   Future<UserModel?> loadUserProfile() async{
     final firebaseUser = auth.currentUser;
     if(firebaseUser == null) return null;
@@ -37,7 +41,10 @@ class AuthService {
   Future<UserModel?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUsers = await GoogleSignIn().signIn();
-      if (googleUsers == null) return null;
+      if (googleUsers == null) {
+        print(">>> User cancelled sign in");
+        return null;
+      }
 
       final GoogleSignInAuthentication googleAuth = await googleUsers.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -45,12 +52,31 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      await auth.signInWithCredential(credential);
+      final result = await auth.signInWithCredential(credential);
+      final firebaseUser = result.user;
+      if (firebaseUser == null) return null;
+
+      // Kiểm tra user đã có trong Firestore chưa
+      final existing = await UserService().getUserByUid(firebaseUser.uid);
+      if (existing == null) {
+        // Chưa có → tạo mới
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .set({
+          'name': firebaseUser.displayName ?? '',
+          'email': firebaseUser.email ?? '',
+          'phone': '',
+          'born': '',
+          'createAt': DateTime.now(),
+        });
+      }
 
       return await loadUserProfile();
 
-    } catch (e) {
-      print("Google login error: $e");
+    } catch (e, stackTrace) {
+      print(">>> Google login error TYPE: ${e.runtimeType}");
+      print(">>> Google login error: $e");
       return null;
     }
   }

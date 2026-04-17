@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/infor_workout_screen.dart';
-class Menu extends StatefulWidget{
+import '../services/auth_service.dart';
+import '../screens/login_screen.dart';
 
+class Menu extends StatelessWidget {
   const Menu({super.key});
 
   @override
-  State<StatefulWidget> createState()  => _MenuState();
-}
-
-class _MenuState extends State<Menu>{
-  @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Drawer(
-        width: 220,
+      width: 220,
       child: Container(
         color: Colors.black,
-        height: double.infinity,
         child: ListView(
           children: [
 
-            Padding(
+            // Title
+            const Padding(
               padding: EdgeInsets.only(top: 60, bottom: 20, left: 20),
               child: Text(
                 "Menu",
@@ -31,33 +28,96 @@ class _MenuState extends State<Menu>{
                 ),
               ),
             ),
-            Divider(color: Colors.white24),
-            // Trang chu
+
+            const Divider(color: Colors.white24),
+
+            // Trang chủ
             ListTile(
-              leading: Icon(Icons.home, color: Colors.white,),
-              title:  Text("Trang chủ", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-              onTap: (){
+              leading: const Icon(Icons.home, color: Colors.white),
+              title: const Text(
+                "Trang chủ",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreen()));
+
+                // Tránh stack chồng
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                );
               },
             ),
 
             // Dữ liệu tập luyện
             ListTile(
-              leading: Icon(Icons.data_saver_on, color: Colors.white,),
-              title:  Text("Dữ liệu tập luyện", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-              onTap: (){
+              leading: const Icon(Icons.data_saver_on, color: Colors.white),
+              title: const Text(
+                "Dữ liệu tập luyện",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                final uid = AuthService().uid; // lấy realtime
+
                 Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(
-                        builder: (context) => InforWorkoutScreen()));
+
+                // Check login
+                if (uid == null || uid.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Bạn chưa đăng nhập"),
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InforWorkoutScreen(uid: uid),
+                  ),
+                );
               },
-            )
+            ),
+
+            // Nút đăng xuất
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.white),
+              title: const Text(
+                "Đăng xuất",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () async {
+                Navigator.pop(context); // đóng drawer trước
+
+                await AuthService().signOut();
+
+                if (!context.mounted) return;
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(), // đổi thành tên màn hình login của bạn
+                  ),
+                      (route) => false, // xóa hết stack, không back lại được
+                );
+              },
+            ),
+
           ],
         ),
-      )
+      ),
     );
   }
 }

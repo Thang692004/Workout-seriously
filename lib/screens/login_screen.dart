@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
@@ -16,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool isloading = false;
+  bool isLoading = false;
   bool obscurePassword = true;
 
   Future<void> _handleLogin() async {
@@ -41,14 +40,18 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() => isloading = true);
+    setState(() => isLoading = true);
     try {
       final user = await AuthService().signInWithEmail(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
 
-      if (user != null && mounted)  Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      if (user != null && mounted)
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
     } on FirebaseAuthException catch (e) {
       String message;
       switch (e.code) {
@@ -85,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } finally {
-      if (mounted) setState(() => isloading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -195,8 +198,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: isloading ? null : _handleLogin,
-                      child: isloading
+                      onPressed: isLoading ? null : _handleLogin,
+                      child: isLoading
                           ? const SizedBox(
                               width: 24,
                               height: 24,
@@ -244,11 +247,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       onPressed: () async {
-                        print("CLICKED");
                         final user = await AuthService().signInWithGoogle();
-
                         if (user != null) {
                           print("Login success: ${user.email}");
+
+                          if (!context.mounted) return;
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(), // đổi thành tên màn hình chính của bạn
+                            ),
+                            (route) => false,
+                          );
                         } else {
                           print("Login failed");
                         }
