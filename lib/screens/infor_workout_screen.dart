@@ -227,7 +227,6 @@ class _InforWorkoutScreenState extends State<InforWorkoutScreen> {
 
   // Sửa thông tin buổi tập
   Future<void> _showEditDialog(DataExercises workoutToEdit) async {
-
     final Map<String, TextEditingController> controllers = {
       for (var name in exerciseNames)
         name: TextEditingController(
@@ -293,7 +292,11 @@ class _InforWorkoutScreenState extends State<InforWorkoutScreen> {
                   name: num.tryParse(controllers[name]!.text) ?? 0,
               };
 
-              await DataExercisesService().fixDataExercises( widget.uid, workoutToEdit.id, updatedExercises, );
+              await DataExercisesService().fixDataExercises(
+                widget.uid,
+                workoutToEdit.id,
+                updatedExercises,
+              );
               Navigator.pop(context);
 
               // Reload lại dữ liệu và tự động bỏ chọn dòng
@@ -372,34 +375,60 @@ class _InforWorkoutScreenState extends State<InforWorkoutScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
+                  flex: 2, // nhỏ hơn
+                  child: ElevatedButton.icon(
                     onPressed: selectedWorkout == null
                         ? null
-                        : () => _showEditDialog(selectedWorkout!),
+                        : () async {
+                      await DataExercisesService().deleteDataExercises(
+                        widget.uid,
+                        selectedWorkout!.id,
+                      );
+                      await _loadData();
+                    },
+                    icon: Icon(Icons.delete_outline, size: 18),
+                    label: Text("Xoá"),
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50),
-                      backgroundColor: Color(0xFFFFE082),
-                      foregroundColor: Color(0xFF0C447C),
-                      // Màu khi nút bị mờ (chưa chọn dòng nào)
+                      minimumSize: Size(double.infinity, 45),
+                      backgroundColor: Color(0xFFE53935),
+                      foregroundColor: Color(0xFFFFFFFF),
                       disabledBackgroundColor: Colors.grey.shade300,
                       disabledForegroundColor: Colors.grey.shade500,
                     ),
-                    child: Text("Sửa buổi tập"),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(width: 8), // width thay vì height trong Row
 
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showAddDialog();
-                    },
+                  flex: 2, // nhỏ hơn
+                  child: ElevatedButton.icon(
+                    onPressed: selectedWorkout == null
+                        ? null
+                        : () => _showEditDialog(selectedWorkout!),
+                    icon: Icon(Icons.edit_outlined, size: 18),
+                    label: Text("Sửa"),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 45),
+                      backgroundColor: Color(0xFFFFE082),
+                      foregroundColor: Color(0xFF0C447C),
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      disabledForegroundColor: Colors.grey.shade500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                Expanded(
+                  flex: 3, // to nhất
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showAddDialog(),
+                    icon: Icon(Icons.add, size: 20),
+                    label: Text("Thêm buổi tập"),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 50),
                       backgroundColor: Color(0xFF0C447C),
                       foregroundColor: Color(0xFFE6F1FB),
                     ),
-                    child: Text("Thêm buổi tập"),
                   ),
                 ),
               ],

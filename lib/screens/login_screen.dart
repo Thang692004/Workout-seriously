@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null && mounted)
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) =>  HomeScreen(uid: user.uid)),
         );
     } on FirebaseAuthException catch (e) {
       String message;
@@ -257,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  HomeScreen(), // đổi thành tên màn hình chính của bạn
+                                  HomeScreen(uid: user.uid), // đổi thành tên màn hình chính của bạn
                             ),
                             (route) => false,
                           );

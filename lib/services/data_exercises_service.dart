@@ -128,4 +128,9 @@ class DataExercisesService {
     }
     await batch.commit();
   }
+
+  // Xóa dữ liệu tập luyện
+  Future<void> deleteDataExercises(String uid, String sessionId) async{
+    await _historyRef(uid).doc(sessionId).delete();
+  }
 }

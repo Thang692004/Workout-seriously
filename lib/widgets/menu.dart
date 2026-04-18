@@ -42,13 +42,22 @@ class Menu extends StatelessWidget {
                 ),
               ),
               onTap: () {
+                final uid = AuthService().uid;
+
                 Navigator.pop(context);
+
+                if (uid == null || uid.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Bạn chưa đăng nhập")),
+                  );
+                  return;
+                }
 
                 // Tránh stack chồng
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
+                    builder: (context) =>  HomeScreen(uid: uid),
                   ),
                 );
               },
