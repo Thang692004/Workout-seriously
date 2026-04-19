@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'menu.dart';
+import '../models/Users.dart';
+import '../screens/profile_screeen.dart';
+import '../services/auth_service.dart';
 
 class AppScaffold extends StatelessWidget {
   final Widget child;
   final Widget? bottomNav;
   final bool showDrawer;
   final String title;
+  final UserModel? user;
 
   const AppScaffold({
     super.key,
@@ -14,6 +18,7 @@ class AppScaffold extends StatelessWidget {
     required this.title,
     this.bottomNav,
     this.showDrawer = false,
+    this.user,
   });
 
   @override
@@ -96,10 +101,32 @@ class AppScaffold extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const CircleAvatar(
-                          radius: 14,
-                          backgroundColor: Colors.grey,
-                          child: Icon(Icons.person, size: 14, color: Colors.white),
+
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileScreeen(user: user),
+                              ),
+                            );
+                          },
+                          child: Builder(
+                            builder: (context) {
+                              final String? avatarUrl = AuthService().getAvataUrl();
+
+                              return CircleAvatar(
+                                radius: 14,
+                                backgroundColor: Colors.grey,
+                                backgroundImage: avatarUrl != null
+                                    ? NetworkImage(avatarUrl) // Google → ảnh Google
+                                    : null,
+                                child: avatarUrl == null
+                                    ? Icon(Icons.person, size: 14, color: Colors.white) // Email → icon
+                                    : null,
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),

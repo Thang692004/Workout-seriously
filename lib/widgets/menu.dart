@@ -31,11 +31,11 @@ class Menu extends StatelessWidget {
 
             const Divider(color: Colors.white24),
 
-            // Trang chủ
+            // Báo cáo
             ListTile(
               leading: const Icon(Icons.home, color: Colors.white),
               title: const Text(
-                "Trang chủ",
+                "Báo cáo",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,

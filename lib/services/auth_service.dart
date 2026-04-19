@@ -126,4 +126,16 @@ class AuthService {
     await auth.signOut();
     await GoogleSignIn().signOut();
   }
+
+  // Lấy ảnh của user
+  String? getAvataUrl(){
+    final user = auth.currentUser;
+    if(user == null) return null;
+
+    for(var info in user.providerData) {
+      if (info.providerId == 'google.com') return info.photoURL;
+    }
+
+    return null;
+  }
 }
