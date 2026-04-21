@@ -107,7 +107,7 @@ class AppScaffold extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ProfileScreeen(user: user),
+                                builder: (_) => ProfileScreeen(user: AuthService().currentUser),
                               ),
                             );
                           },

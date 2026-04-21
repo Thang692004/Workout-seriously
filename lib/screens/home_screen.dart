@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         strokeWidth: 1,
                       ),
                     ),
-                    belowBarData: BarAreaData(show: false), // ← Bỏ bóng xanh
+                    belowBarData: BarAreaData(show: false),
                   ),
                 ],
               ),
